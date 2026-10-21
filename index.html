@@ -8,14 +8,12 @@
 </head>
 <body>
 
-  <!-- Header Kafe -->
   <header class="header">
     <h1>☕ Kopi Senja Digital</h1>
     <p>Pilih menu favoritmu & tunjukkan pesanan ke kasir!</p>
   </header>
 
   <div class="container">
-    <!-- Filter Kategori -->
     <div class="categories">
       <button class="btn-category active" onclick="filterMenu('semua')">Semua</button>
       <button class="btn-category" onclick="filterMenu('makanan')">Makanan</button>
@@ -23,17 +21,13 @@
       <button class="btn-category" onclick="filterMenu('camilan')">Camilan</button>
     </div>
 
-    <!-- Grid Tempat Menu Ditampilkan -->
     <main id="menu-container" class="menu-grid">
-      <!-- Data menu akan di-render oleh JavaScript -->
+      <!-- Di-render oleh JavaScript -->
     </main>
 
-    <!-- Ringkasan Pesanan (Cart) -->
     <aside class="cart-section">
       <h2>🛒 Ringkasan Pesanan</h2>
-      <ul id="cart-list" class="cart-list">
-        <!-- Item keranjang di-render oleh JavaScript -->
-      </ul>
+      <ul id="cart-list" class="cart-list"></ul>
       <div class="cart-total">
         <span>Total:</span>
         <strong id="total-price">Rp 0</strong>
