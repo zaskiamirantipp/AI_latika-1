@@ -1,4 +1,3 @@
-// 1. Array Objects sebagai pengganti Database Menu
 const menuData = [
   {
     id: 1,
@@ -31,13 +30,18 @@ const menuData = [
 ];
 
 let cart = [];
+let currentCategory = 'semua';
 
-// 2. Fungsi Menampilkan Menu ke Layar
+// Fungsi Menampilkan Menu ke Layar
 function renderMenu(data) {
   const container = document.getElementById("menu-container");
   container.innerHTML = "";
 
   data.forEach(item => {
+    // Cek apakah item sudah ada di keranjang untuk menampilkan jumlahnya
+    const cartItem = cart.find(c => c.id === item.id);
+    const qty = cartItem ? cartItem.jumlah : 0;
+
     container.innerHTML += `
       <div class="menu-card">
         <img src="${item.gambar}" alt="${item.nama}">
@@ -46,16 +50,20 @@ function renderMenu(data) {
             <div class="menu-title">${item.nama}</div>
             <div class="menu-price">Rp ${item.harga.toLocaleString('id-ID')}</div>
           </div>
-          <button class="btn-add" onclick="addToCart(${item.id})">+ Tambah</button>
+          <div class="qty-control">
+            <button class="btn-qty minus" onclick="decreaseCart(${item.id})">-</button>
+            <span class="qty-number" id="qty-${item.id}">${qty}</span>
+            <button class="btn-qty" onclick="increaseCart(${item.id})">+</button>
+          </div>
         </div>
       </div>
     `;
   });
 }
 
-// 3. Fungsi Filter berdasarkan Kategori
+// Fungsi Filter berdasarkan Kategori
 function filterMenu(kategori) {
-  // Ubah status tombol aktif
+  currentCategory = kategori;
   const buttons = document.querySelectorAll('.btn-category');
   buttons.forEach(btn => btn.classList.remove('active'));
   event.target.classList.add('active');
@@ -68,8 +76,8 @@ function filterMenu(kategori) {
   }
 }
 
-// 4. Fungsi Menambah Item ke Keranjang
-function addToCart(id) {
+// Tambah Jumlah Item
+function increaseCart(id) {
   const item = menuData.find(m => m.id === id);
   const existingItem = cart.find(c => c.id === id);
 
@@ -79,11 +87,34 @@ function addToCart(id) {
     cart.push({ ...item, jumlah: 1 });
   }
 
-  updateCartView();
+  updateAllViews();
 }
 
-// 5. Fungsi Mengelolakan Tampilan Keranjang & Total
-function updateCartView() {
+// Kurangi Jumlah Item
+function decreaseCart(id) {
+  const existingItem = cart.find(c => c.id === id);
+
+  if (existingItem) {
+    existingItem.jumlah -= 1;
+    if (existingItem.jumlah <= 0) {
+      // Hapus dari keranjang jika jumlahnya 0
+      cart = cart.filter(c => c.id !== id);
+    }
+  }
+
+  updateAllViews();
+}
+
+// Memperbarui Tampilan Keranjang & Angka di Kartu Menu Sekaligus
+function updateAllViews() {
+  // Update angka di kartu menu sesuai kategori aktif saat ini
+  let activeData = currentCategory === 'semua' 
+    ? menuData 
+    : menuData.filter(item => item.kategori === currentCategory);
+  
+  renderMenu(activeData);
+
+  // Update ringkasan keranjang bawah
   const cartList = document.getElementById("cart-list");
   const totalPrice = document.getElementById("total-price");
   
@@ -108,7 +139,7 @@ function updateCartView() {
   totalPrice.innerText = `Rp ${total.toLocaleString('id-ID')}`;
 }
 
-// 6. Integrasi Kirim Pesanan ke WhatsApp Kasir (Ganti nomor sesuai kebutuhan)
+// Checkout WhatsApp
 function checkoutWA() {
   if (cart.length === 0) {
     alert("Silakan pilih menu terlebih dahulu!");
@@ -127,11 +158,10 @@ function checkoutWA() {
 
   pesan += `\n*Total: Rp ${total.toLocaleString('id-ID')}*`;
 
-  // Encode teks pesan agar bisa dikirim via URL
   const url = `https://wa.me/${nomerWA}?text=${encodeURIComponent(pesan)}`;
   window.open(url, '_blank');
 }
 
-// Jalankan fungsi awal saat halaman dimuat
+// Jalankan saat pertama kali dimuat
 renderMenu(menuData);
-updateCartView();
+updateAllViews();
